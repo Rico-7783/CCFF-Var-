@@ -1,0 +1,20 @@
+CCFF FRÉJUS V1 - MODE D'EMPLOI
+
+Fichier principal : index.html
+
+Fonctions incluses :
+- Accueil avec logo officiel
+- Alerte feu
+- Pointage fumée en mode test manuel
+- Message radio automatique
+- GPS du téléphone
+- Carte DFCI Géoportail
+- Boutons 112 et 18
+
+IMPORTANT :
+La fonction "point DFCI automatique" réelle nécessite encore la base des points DFCI.
+Cette V1 permet de tester l'ergonomie et le message radio.
+
+Installation simple :
+1. Ouvrir index.html avec Chrome.
+2. Sur Android : menu Chrome > Ajouter à l'écran d'accueil.

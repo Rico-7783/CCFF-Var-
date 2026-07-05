@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>CCFF Fréjus V1</title>
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#101820">
+<style>
+*{box-sizing:border-box}
+body{margin:0;font-family:Arial,Helvetica,sans-serif;background:#101820;color:#fff}
+header{text-align:center;padding:16px 12px;background:#111}
+.logo{width:130px;max-width:45%;border-radius:50%;background:white}
+h1{font-size:24px;margin:10px 0 4px}
+.sub{color:#ffb347;font-weight:bold}
+main{padding:12px;max-width:760px;margin:auto}
+.card{background:#182430;border:1px solid #35495e;border-radius:16px;padding:14px;margin:12px 0;box-shadow:0 4px 12px rgba(0,0,0,.3)}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.btn{display:block;width:100%;border:0;border-radius:14px;padding:16px 10px;text-align:center;text-decoration:none;color:white;font-weight:bold;font-size:18px;margin:8px 0}
+.red{background:#c62828}.orange{background:#ef8b16}.green{background:#2e7d32}.blue{background:#1565c0}.dark{background:#333}.yellow{background:#f9a825;color:#111}
+h2{color:#ffb347;margin:6px 0 12px}
+label{display:block;font-weight:bold;margin-top:10px}
+input,textarea{width:100%;padding:12px;border-radius:10px;border:1px solid #64748b;background:#0f1720;color:white;font-size:16px;margin-top:5px}
+textarea{min-height:80px}
+.checks{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.check{background:#0f1720;border:1px solid #3b4d61;border-radius:10px;padding:10px;font-weight:normal}
+.check input{width:auto;margin-right:6px}
+.message{white-space:pre-wrap;background:#050505;border:1px solid #555;border-radius:12px;padding:12px;margin-top:12px;line-height:1.35}
+.warn{border:2px solid #f9a825;color:#ffd166;padding:12px;border-radius:12px;text-align:center;font-weight:bold}
+.small{font-size:13px;color:#cbd5e1;text-align:center}
+</style>
+</head>
+<body>
+<header>
+  <img class="logo" src="logo_ccff_frejus.png" alt="Logo CCFF Fréjus">
+  <h1>🚒 CCFF FRÉJUS V1</h1>
+  <div class="sub">Fiche feu + pointage fumée + message radio</div>
+</header>
+<main>
+<section class="card">
+  <div class="grid">
+    <button class="btn red" onclick="show('alerte')">🔥 ALERTE FEU</button>
+    <button class="btn orange" onclick="show('fumee')">📷 POINTER FUMÉE</button>
+    <a class="btn green" target="_blank" href="https://www.geoportail.gouv.fr/carte?c=6.735,43.433&z=13&l0=GEOGRAPHICALGRIDSYSTEMS.MAPS::GEOPORTAIL:OGC:WMTS(1)&l1=GEOGRAPHICALGRIDSYSTEM.DFCI::GEOPORTAIL:OGC:WMTS(1)&permalink=yes">🗺️ CARTE DFCI</a>
+    <button class="btn blue" onclick="show('numeros')">☎️ NUMÉROS</button>
+  </div>
+</section>
+
+<section id="alerte" class="card">
+  <h2>🔥 Alerte feu</h2>
+  <button class="btn green" onclick="gps()">📍 Récupérer ma position GPS</button>
+  <label>Commune</label><input id="commune" value="Fréjus">
+  <label>Votre position GPS</label><input id="gps" placeholder="Automatique ou manuel">
+  <label>Direction / pointage fumée</label><input id="direction" placeholder="Ex : ENE 62°">
+  <label>Distance estimée</label><input id="distance" placeholder="Ex : 1,2 km">
+  <label>Point DFCI probable</label><input id="dfci" placeholder="Ex : FRJ-124">
+  <label>Repère / accès</label><textarea id="acces" placeholder="Piste, route, quartier, point de rendez-vous..."></textarea>
+
+  <h2>Je vois</h2>
+  <div class="checks">
+    <label class="check"><input type="checkbox" name="obs" value="fumée visible">Fumée</label>
+    <label class="check"><input type="checkbox" name="obs" value="flammes visibles">Flammes</label>
+    <label class="check"><input type="checkbox" name="obs" value="panache">Panache</label>
+    <label class="check"><input type="checkbox" name="obs" value="reprise de feu">Reprise</label>
+  </div>
+
+  <h2>Menace</h2>
+  <div class="checks">
+    <label class="check"><input type="checkbox" name="menace" value="massif">Massif</label>
+    <label class="check"><input type="checkbox" name="menace" value="habitations">Habitations</label>
+    <label class="check"><input type="checkbox" name="menace" value="camping / PRL">Camping / PRL</label>
+    <label class="check"><input type="checkbox" name="menace" value="route">Route</label>
+  </div>
+
+  <label>Vent</label><input id="vent" placeholder="Faible / moyen / fort - direction">
+  <button class="btn red" onclick="generer()">🚨 GÉNÉRER MESSAGE RADIO</button>
+  <button class="btn green" onclick="copier()">📋 COPIER MESSAGE</button>
+  <div id="message" class="message">Le message apparaîtra ici.</div>
+</section>
+
+<section id="fumee" class="card" style="display:none">
+  <h2>📷 Pointer la fumée</h2>
+  <div class="warn">V1 test : l’app enregistre la direction au clavier. V2 : caméra + boussole automatique.</div>
+  <label>Direction vers la fumée</label><input id="dirFumee" placeholder="Ex : ENE 62°">
+  <label>Distance estimée</label><input id="distFumee" placeholder="Ex : 1,2 km">
+  <label>Point DFCI probable</label><input id="dfciFumee" placeholder="Ex : FRJ-124">
+  <button class="btn orange" onclick="utiliserPointage()">✅ UTILISER DANS LE MESSAGE</button>
+  <p class="small">Pour l’automatique réel, il faudra intégrer GPS + boussole + base des points DFCI.</p>
+</section>
+
+<section id="numeros" class="card" style="display:none">
+  <h2>☎️ Numéros utiles</h2>
+  <a class="btn red" href="tel:112">📞 112</a>
+  <a class="btn blue" href="tel:18">📞 18 Pompiers</a>
+  <a class="btn orange" href="tel:">📞 Orange83 à compléter</a>
+</section>
+
+<section class="card">
+  <div class="warn">Toujours vérifier sur le terrain avant transmission.</div>
+</section>
+</main>
+
+<script>
+function show(id){
+  ["alerte","fumee","numeros"].forEach(function(x){document.getElementById(x).style.display="none";});
+  document.getElementById(id).style.display="block";
+}
+function val(id){return document.getElementById(id).value.trim();}
+function checked(name){return Array.from(document.querySelectorAll('input[name="'+name+'"]:checked')).map(function(x){return x.value;}).join(", ");}
+function gps(){
+  if(!navigator.geolocation){alert("GPS non disponible");return;}
+  navigator.geolocation.getCurrentPosition(function(pos){
+    document.getElementById("gps").value=pos.coords.latitude.toFixed(6)+", "+pos.coords.longitude.toFixed(6);
+  },function(){alert("GPS refusé ou indisponible");},{enableHighAccuracy:true,timeout:10000});
+}
+function utiliserPointage(){
+  document.getElementById("direction").value=val("dirFumee");
+  document.getElementById("distance").value=val("distFumee");
+  document.getElementById("dfci").value=val("dfciFumee");
+  show("alerte");
+}
+function generer(){
+  const msg =
+`Orange83 de Patrouille Fréjus.
+
+Je confirme un départ de feu.
+
+Votre position : ${val("gps")}
+Commune : ${val("commune")}
+
+Départ de feu :
+Direction : ${val("direction")}
+Distance estimée : ${val("distance")}
+Point DFCI probable : ${val("dfci")}
+Repère / accès : ${val("acces")}
+
+Observation : ${checked("obs")}
+Menace : ${checked("menace")}
+Vent : ${val("vent")}
+
+Nous nous déplaçons pour reconnaissance.
+Je reste à l'écoute.`;
+  document.getElementById("message").textContent=msg;
+  return msg;
+}
+function copier(){
+  const msg=generer();
+  if(navigator.clipboard){
+    navigator.clipboard.writeText(msg).then(function(){alert("Message copié");});
+  }else{
+    alert("Copie automatique impossible, le message est affiché.");
+  }
+}
+if("serviceWorker" in navigator){navigator.serviceWorker.register("sw.js").catch(function(){});}
+</script>
+</body>
+</html>
